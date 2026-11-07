@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: app }
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 3s
+      retries: 10
+
+  api:
+    build: { context: ., target: prod }
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/app
+      SECRET_KEY: ${SECRET_KEY:-dev-only-change-me-please-use-32-bytes!}
+    ports: ["8000:8000"]
+    depends_on: { db: { condition: service_healthy } }
+
+  testdb:
+    profiles: ["test"]
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: app_test }
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 3s
+      retries: 10
+
+  tests:
+    profiles: ["test"]
+    build: { context: ., target: test }
+    environment:
+      DATABASE_URL: postgresql://app:app@testdb:5432/app_test
+    depends_on: { testdb: { condition: service_healthy } }

@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Tasks</title></head>
+<body>
+  <h2>Task Manager</h2>
+  <input id="u" placeholder="username"> <input id="p" type="password" placeholder="password">
+  <button onclick="auth('register')">Register</button> <button onclick="auth('login')">Login</button>
+  <hr>
+  <input id="t" placeholder="new task"> <button onclick="add()">Add</button>
+  <ul id="list"></ul>
+<script>
+let token = "";
+const H = () => ({ "Authorization": "Bearer " + token, "Content-Type": "application/json" });
+async function auth(kind) {
+  const u = document.getElementById("u").value, p = document.getElementById("p").value;
+  if (kind === "register")
+    await fetch("/auth/register", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({username: u, password: p}) });
+  const r = await fetch("/auth/login", { method: "POST", body: new URLSearchParams({username: u, password: p}) });
+  if (r.ok) { token = (await r.json()).access_token; load(); } else alert("Login failed");
+}
+async function load() {
+  const r = await fetch("/tasks", { headers: H() });
+  const ul = document.getElementById("list"); ul.innerHTML = "";
+  for (const t of await r.json()) { const li = document.createElement("li"); li.textContent = t.title; ul.appendChild(li); }
+}
+async function add() {
+  await fetch("/tasks", { method: "POST", headers: H(), body: JSON.stringify({title: document.getElementById("t").value}) });
+  load();
+}
+</script></body></html>
