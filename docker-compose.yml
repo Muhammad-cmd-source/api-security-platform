@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: app }
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U app"]
       interval: 3s
       retries: 10
 
@@ -20,7 +20,7 @@ services:
     image: postgres:16-alpine
     environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: app_test }
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U app"]
       interval: 3s
       retries: 10
 
