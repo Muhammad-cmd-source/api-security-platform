@@ -10,7 +10,7 @@ services:
   api:
     build: { context: ., target: prod }
     environment:
-      DATABASE_URL: postgresql://app:app@db:5432/app
+      DATABASE_URL: postgresql+psycopg2://app:app@db:5432/app
       SECRET_KEY: ${SECRET_KEY:-dev-only-change-me-please-use-32-bytes!}
     ports: ["8000:8000"]
     depends_on: { db: { condition: service_healthy } }
@@ -28,5 +28,5 @@ services:
     profiles: ["test"]
     build: { context: ., target: test }
     environment:
-      DATABASE_URL: postgresql://app:app@testdb:5432/app_test
+      DATABASE_URL: postgresql+psycopg2://app:app@testdb:5432/app_test
     depends_on: { testdb: { condition: service_healthy } }
